@@ -19,8 +19,8 @@ def reset():
     buz.write(0)
 
 
-def warn():
-    print(f"{'='*10} !Fire! {'='*10}")
+def warn(val):
+    print(f"{'='*10} Fire! {val*10}% near{'='*10}")
     warn_led.write(1)
     buz.write(1)
 
@@ -31,15 +31,16 @@ def normal():
 
 while True:
     sleep(0.5)
-    """ reset() """
-    value = fire_sensor.read()
-    print(value)
-    """ if value is None:
+    reset()
+    # So many filters to the value because the flame sensor give values in decimal and in decreasing order.
+    value = int(abs(round(fire_sensor.read(), 1)*10-10))
+    if value is None:
         pass
-    elif value is True:
+    elif value <= 0:
         normal()
-
+    elif value > 0:
+        warn(value)
     else:
-        warn() """
+        pass
 
 board.exit()
