@@ -1,0 +1,109 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <title>GUI Motion Detector</title>
+  </head>
+  <body style="text-align: center" onload="check_notification()">
+    <div
+      class="container"
+      style="
+        max-width: 500px;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 5px;
+        border: 1px solid black;
+      "
+    >
+      <h2>GUI Motion Detector</h2>
+      <br />
+      <h4 id="state"></h4>
+      <small style="color: grey"
+        >Can be a little latency in sensing motion.</small
+      ><br />
+      <button
+        class="btn btn-primary"
+        id="per_button"
+        onclick="request_notification()"
+        style="
+          margin-top: 10px;
+          margin-left: auto;
+          margin-right: auto;
+          display: none;
+        "
+      >
+        Reqest Notification
+      </button>
+    </div>
+    <script>
+      const state = document.getElementById('state');
+      const warn_icon =
+        'https://raw.githubusercontent.com/Yohith-Programmer101/Storage/main/Arduino/GUI%20Motion%20Detector/warning.jpg';
+      var granted = false;
+      not_detected();
+
+      function check_notification() {
+        if (!('Notification' in window)) {
+          alert('This browser does not support desktop notification');
+          granted = false;
+        } else if (Notification.permission === 'granted') {
+          granted = true;
+        } else if (Notification.permission !== 'denied') {
+          document.getElementById('per_button').style.display = 'block';
+        }
+      }
+
+      function request_notification() {
+        Notification.requestPermission().then(function (permission) {
+          if (permission === 'granted') {
+            granted = true;
+            document.getElementById('per_button').style.display = 'none';
+          } else {
+            granted = false;
+            document.getElementById('per_button').style.display = 'none';
+          }
+        });
+      }
+
+      function notify(Title, Body, Icon) {
+        if (granted == true) {
+          var n = new Notification(Title, { body: Body, icon: Icon });
+        } else {
+          console.log('Grant notification permission to notify you.');
+        }
+      }
+
+      function not_detected() {
+        state.innerText = 'Motion not detected...';
+        state.style.color = 'black';
+      }
+
+      function detected() {
+        state.innerText = 'Motion detected !';
+        state.style.color = 'red';
+        notify(
+          'Motion Detected!',
+          'Your PIR Motion Sensor has detected a motion.',
+          warn_icon
+        );
+      }
+
+      var ws = new WebSocket('ws://127.0.0.1:5678/');
+      ws.onmessage = function (event) {
+        var state = parseInt(event.data);
+        if (state == 1) {
+          detected();
+        } else if (state == 0) {
+          not_detected();
+        }
+      };
+    </script>
+  </body>
+</html>
