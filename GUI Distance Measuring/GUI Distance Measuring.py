@@ -10,6 +10,6 @@ async def measure(websocket, path):
         distance = con.readline().decode('utf-8')
         await websocket.send(con.readline().decode('utf-8'))
 
-start_webserver = websockets.serve(measure, "192.168.108.195", 5678)
+start_webserver = websockets.serve(measure, "127.0.0.1", 5678)
 asyncio.get_event_loop().run_until_complete(start_webserver)
 asyncio.get_event_loop().run_forever()
