@@ -1,0 +1,47 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <title>GUI Distance Measuring</title>
+  </head>
+  <body style="text-align: center">
+    <div
+      class="container"
+      style="
+        max-width: 500px;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 5px;
+        border: 1px solid black;
+      "
+    >
+      <h2>GUI Distance Measuring</h2>
+      <br />
+      <h3>Distance:</h3>
+      <h4 id="distance"></h4>
+    </div>
+    <script>
+      var ws = new WebSocket('ws://192.168.108.195:5678/');
+      ws.onmessage = function (event) {
+        try {
+          var state = parseInt(event.data);
+          if (state == 0 || state > 990) {
+            document.getElementById('distance').innerText =
+              'The object is either too closer or too far.';
+          } else {
+            document.getElementById('distance').innerText = state + ' Cm';
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    </script>
+  </body>
+</html>
